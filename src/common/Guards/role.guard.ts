@@ -10,8 +10,9 @@ import { Reflector } from '@nestjs/core';
 export class RoleGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
   canActivate(context: ExecutionContext): boolean {
+    
     const roles = this.reflector.get('roles', context.getClass());
-
+    console.log({roles});
     const request = context.switchToHttp().getRequest();
     if (!roles.includes(request.user.role)) {
       throw new UnauthorizedException('not allowed for you');

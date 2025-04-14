@@ -3,19 +3,21 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateCategoryDTO, UpdateCategoryDTO } from './dto';
+import { CreateCategoryDTO, DeleteCategoryDTO, UpdateCategoryDTO } from './dto';
 import { CategoryRepository, TCategory } from 'src/DB/Models/Category';
 import { TUser } from 'src/DB';
 import { Types } from 'mongoose';
 import { CloudService } from 'src/common/Services/cloud.service';
 import slugify from 'slugify';
 import { Request } from 'express';
+import { ProductRepository } from 'src/DB/Models/Product/product.repository';
 
 @Injectable()
 export class CategoryService {
   constructor(
     private readonly categoryRepository: CategoryRepository,
     private readonly cloudService: CloudService,
+    private readonly productRepository: ProductRepository,
   ) {}
 
   async getOne(id: Types.ObjectId) {
@@ -63,10 +65,31 @@ export class CategoryService {
       const { secure_url } = await this.cloudService.uploadFile({
         path: file.path,
         public_id: categoryExist.image.public_id,
+        folder: categoryExist.folderId,
       });
       categoryExist.image.secure_url = secure_url;
     }
-    categoryExist.updatedBy = req.user._id;
+    categoryExist.updatedBy = req['user']._id;
     return await categoryExist.save();
+  }
+
+  async deleteCategory(body: DeleteCategoryDTO) {
+    const { id } = body;
+    const category = await this.categoryRepository.findOne({ _id: id });
+    if (!category) {
+      throw new NotFoundException('category not found');
+    }
+
+    const products = await this.productRepository.find({
+      filter: { category: id },
+    });
+    products.forEach(async (product) => {
+      if (product.images.length) {
+        await this.cloudService.deleteFolder(product.folderId);
+      }
+      await product.deleteOne();
+    });
+    await this.cloudService.deleteFolder(category.folderId);
+    await category.deleteOne();
   }
 }

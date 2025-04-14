@@ -23,6 +23,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('invalid bearer token');
     }
     // Hambozo token
+    process
     const token = authorization.split(' ')[1];
     const data = this.tokenService.verify(token, {
       secret: process.env.JWT_SECRET,

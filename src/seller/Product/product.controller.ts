@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Req,
   UploadedFiles,
@@ -11,7 +12,7 @@ import { UserRoles } from 'src/common/enums';
 import { ProductService } from './product.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/common/Utils/multer';
-import { CloudInterceptor } from 'src/common/interceptor/cloud.interceptor';
+import { CloudInterceptor, CloudInterceptorMultiFiles } from 'src/common/interceptor/cloud.interceptor';
 import { CreateProductDTO } from './dto';
 import { Request } from 'express';
 
@@ -21,7 +22,7 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor('files', 3, multerOptions()))
+  @UseInterceptors(FilesInterceptor('files', 3, multerOptions()), CloudInterceptorMultiFiles)
   async addProduct(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() createProductDTO: CreateProductDTO,
@@ -33,5 +34,11 @@ export class ProductController {
       req,
     );
     return { data: product };
+  }
+
+  @Get()
+  async getAllProducts(@Req() req: Request) {
+    const products = await this.productService.getAllProducts(req['parsedQuery']);
+    return { data: products };
   }
 }

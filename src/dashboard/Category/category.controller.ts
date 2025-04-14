@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Param,
   Post,
   Put,
@@ -10,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { Auth } from 'src/common/Decorators/auth.decorator';
 import { CategoryService } from './category.service';
-import { CreateCategoryDTO, UpdateCategoryDTO } from './dto';
+import { CreateCategoryDTO, DeleteCategoryDTO, UpdateCategoryDTO } from './dto';
 import { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -54,5 +55,11 @@ export class CategoryController {
       req,
     );
     return { success: true, data: category };
+  }
+
+
+  @Delete()
+  async delete(@Body() body: DeleteCategoryDTO) {
+    return await this.categoryService.deleteCategory(body);
   }
 }

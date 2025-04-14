@@ -27,8 +27,31 @@ export class ProductService {
       discount,
       description,
       category,
-      createdBy: req.user._id,
+      createdBy: req['user']._id,
     };
+    product.images = req.body.images;
+    product.folderId = req.body.folderId;
+    console.log({ images: product.images, folderId: product.folderId });
+
     return await this.productRepository.create(product);
+  }
+/**
+ * 
+ * @param query 
+ * @returns 
+ */
+  async getAllProducts(query: any) {
+    let {sort,limit,page,...filter} = query;
+    filter = JSON.parse(JSON.stringify(filter).replace(/lte|gte|eq|ne|in|nin/g,(ele)=>{
+      return `$${ele}`
+    }))
+    console.log({filter});
+    const skip = (page - 1) * limit;
+    return await this.productRepository.find({
+      limit,
+      skip,
+      sort,
+      filter
+    });
   }
 }

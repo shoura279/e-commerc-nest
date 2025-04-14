@@ -61,5 +61,8 @@ export class Product {
   folderId: string;
 }
 export const productSchema = SchemaFactory.createForClass(Product);
-
+productSchema.post('deleteMany',async(docs)=>{
+  console.log({docs});
+  
+})
 export type TProduct = HydratedDocument<Product> & Document;

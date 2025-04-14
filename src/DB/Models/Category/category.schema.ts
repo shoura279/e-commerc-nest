@@ -28,7 +28,7 @@ export class Category {
 
   @Prop({ type: SchemaTypes.ObjectId, ref: 'User', required: true })
   createdBy: Types.ObjectId;
-  @Prop({ type: SchemaTypes.ObjectId, ref: 'User', required: true })
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'User' })
   updatedBy: Types.ObjectId;
 }
 

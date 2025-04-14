@@ -6,4 +6,4 @@ import { RoleGuard } from '../Guards/role.guard';
 export function Auth(...roles: string[]) {
   return applyDecorators(Roles(...roles), UseGuards(AuthGuard, RoleGuard));
 }
-Auth('user', 'admin'); // [] >> 'user','admin' >>
+// Auth('user', 'admin'); // [] >> 'user','admin' >>

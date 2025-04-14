@@ -1,4 +1,5 @@
 import {
+  IsMongoId,
   IsNotEmpty,
   IsObject,
   IsOptional,
@@ -27,4 +28,10 @@ export class UpdateCategoryDTO {
   @MinLength(3)
   @IsOptional()
   name?: string;
+}
+
+
+export class DeleteCategoryDTO {
+  @IsMongoId()
+  id?: string;
 }
